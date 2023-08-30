@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTW App Template</title>
+    <!--
+        The tailwind CDN is designed for development purposes only, and is not the best choice for production.
+        Read more here: https://tailwindcss.com/docs/installation 
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- example for dark theme styling when using tailwind cdn -->
+    <style>
+        .dark .dark\:text-white {
+            color: #fff;
+        }
+
+        /*add your custom css rules here*/
+        div div div {
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body class="dark:text-white">
+
+    <!-- your app code goes here -->
+    <div class="max-w-[560px] mt-4 mx-auto pb-10 px-4">
+        <div class="text-2xl pb-6 text-center">My Wallet</div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-0" id="grid">
+            <div class="font-bold">Symbol</div>
+            <div class="font-bold">Balance</div>
+            <div class="font-bold hidden sm:block">Price</div>
+            <div class="font-bold hidden sm:block">Cost</div>
+        </div>
+        <div id="error" class="py-2"></div>
+
+        <!-- special scripts for integration in MTW gallery - must be placed at the bottom of the HTML after your code -->
+        <script>
+            console.log('MTW App Template')
+
+            // prototype example
+            Number.prototype.toFixedValue = function (digits = 2) {
+                return this.toLocaleString('en-US', { maximumFractionDigits: digits })
+            }
+
+            // create table row
+            const createRow = (sym, val) => {
+                return `
+                    <div>${sym}</div>
+                    <div>${val.balance ? val.balance.toFixedValue(4) : 0}</div>
+                    <div class="hidden sm:block">$${val.price ? val.price.toFixedValue() : 0}</div>
+                    <div class="hidden sm:block">$${val.value ? val.value.toFixedValue() : 0}</div>
+                `
+            }
+
+            // create table
+            const createTable = (data) => {
+                if (!data || typeof data !== 'object') return
+                clearGrid()
+                const grid = document.getElementById('grid')                
+                for (const [key, value] of Object.entries(data)) {
+                    grid.insertAdjacentHTML('beforeend', createRow(key, value))
+                }
+            }
+
+            // custom config for the MTW app 
+            const mtwAppConfig = {
+                border: true // app border in the MTW page                    
+            }
+
+            ///////////////////////////////////////////////////////
+            // implement this functions in order to use private API        
+            const sendPrivateApiRequest = async () => {
+                // your code here:
+                //sendRequestToParent({ method: 'getAssets' })
+            }
+
+            window.addEventListener('load', () => {
+                sendRequestToParent({ method: 'getBalances' })
+            })
+            /*document.addEventListener('DOMContentLoaded', () => {
+                // your code here:
+                sendRequestToParent({ method: 'getBalances' })
+            })*/
+
+            const acceptPrivateApiResponse = async (data) => {
+                // process received data here:
+                console.log(data)
+                try {
+                    if (Object.entries(data.data).length > 0) {
+                        document.getElementById('error').innerText = ''
+                        createTable(data.data)
+                    } else {
+                        clearGrid()
+                        document.getElementById('error').innerText = 'No data available'
+                    }
+                } catch (e) {
+                    clearGrid()
+                    document.getElementById('error').innerText = 'No data available'
+                }
+            }
+
+            const clearGrid = ()=>{
+                const grid = document.getElementById('grid')
+                while (grid.children.length > 4) {
+                    grid.removeChild(grid.lastChild)
+                }
+            }
+
+        </script>
+        <script src="https://morethanwallet.com/appstore/index.js"></script>
+</body>
+
+</html>
