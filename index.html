@@ -34,7 +34,7 @@
             <div class="font-bold hidden sm:block">Price</div>
             <div class="font-bold hidden sm:block">Cost</div>
         </div>
-        <div id="error" class="py-2"></div>
+        <div id="error" class="py-2">No data</div>
 
         <!-- special scripts for integration in MTW gallery - must be placed at the bottom of the HTML after your code -->
         <script>
@@ -80,10 +80,6 @@
             window.addEventListener('load', () => {
                 sendRequestToParent({ method: 'getBalances' })
             })
-            /*document.addEventListener('DOMContentLoaded', () => {
-                // your code here:
-                sendRequestToParent({ method: 'getBalances' })
-            })*/
 
             const acceptPrivateApiResponse = async (data) => {
                 // process received data here:
@@ -94,11 +90,11 @@
                         createTable(data.data)
                     } else {
                         clearGrid()
-                        document.getElementById('error').innerText = 'No data available'
+                        document.getElementById('error').innerText = 'No data'
                     }
                 } catch (e) {
                     clearGrid()
-                    document.getElementById('error').innerText = 'No data available'
+                    document.getElementById('error').innerText = 'No data'
                 }
             }
 
